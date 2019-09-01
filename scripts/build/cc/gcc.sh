@@ -1236,6 +1236,10 @@ do_gcc_backend() {
         fi
     fi
 
+    if [ "${CT_GCC_5_or_later}" = "y" ]; then
+        extra_config+=("--with-diagnostics-color=auto")
+    fi
+
     CT_DoLog DEBUG "Extra config passed: '${extra_config[*]}'"
 
     # We may need to modify host/build/target CFLAGS separately below
