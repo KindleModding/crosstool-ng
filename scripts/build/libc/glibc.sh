@@ -14,9 +14,56 @@ glibc_get()
     return 0
 }
 
+do_libc_patch_aclocal.m4() {
+    cat << EOF >> aclocal.m4
+AC_DEFUN([CT_NG_AC_CHECK_PROG_VER],
+[AC_CHECK_PROGS([\$1], [\$2])
+if test -z "[\$]\$1"; then
+  ac_verc_fail=yes
+else
+  ac_verc_fail=no
+fi
+ifelse([\$6],,,
+[if test \$ac_verc_fail = yes; then
+  \$6
+fi])
+])
+EOF
+
+    # And make sure the autoconf sanity checks won't bother us...
+    sed -re \
+        "s/(m4_define\(\[GLIBC_AUTOCONF_VERSION\], \[)([[:digit:]\.]*)(\]\))/\1$(autoconf --version | head -n 1 | cut -d " " -f 4)\3/" \
+        -i aclocal.m4
+}
+
+nerf_tools_version_checks() {
+    if [ -f aclocal.m4 ]; then
+        local conf_file
+
+        # We need to have this in a seperate function
+        # otherwise CT_DoExecLog will append extra stuff
+        # in the appended string.
+        CT_DoExecLog DEBUG do_libc_patch_aclocal.m4
+
+        if [ -f configure.in ]; then
+            conf_file="configure.in"
+        elif [ -f configure.ac ]; then
+            conf_file="configure.ac"
+        fi
+
+        if [ -n "${conf_file}" ]; then
+            CT_DoExecLog DEBUG sed -re \
+                's/\<(AC_CHECK_PROG_VER)/CT_NG_\1/g' \
+                -i ${conf_file}
+        fi
+
+        CT_DoExecLog DEBUG autoconf -f
+    fi
+}
+
 glibc_extract()
 {
-    CT_ExtractPatch GLIBC
+    CT_ExtractPatch GLIBC nerf_tools_version_checks
     if [ "${CT_GLIBC_USE_PORTS_EXTERNAL}" = "y" ]; then
         CT_ExtractPatch GLIBC_PORTS
 
