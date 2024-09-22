@@ -290,7 +290,10 @@ glibc_backend_once()
 
     # Mask C++ compiler. Glibc 2.29+ attempts to build some tests using gcc++, but
     # we haven't built libstdc++ yet. Should really implement #808 after 1.24.0...
-    extra_make_args+=( CXX= )
+    # c.f., https://github.com/stilor/crosstool-ng/commit/f71d3cb1c23d1e76fbc6549a04c64f6a8d5d4621
+    if [ "${CT_GLIBC_2_29_or_later}" = "y" ]; then
+        extra_make_args+=( CXX= )
+    fi
     case "${CT_ARCH},${CT_ARCH_CPU}" in
         powerpc,8??)
             # http://sourceware.org/ml/crossgcc/2008-10/msg00068.html
