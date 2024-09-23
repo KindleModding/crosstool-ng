@@ -1,0 +1,9 @@
+reporter_name="NiLuJe"
+reporter_url="https://github.com/NiLuJe/crosstool-ng"
+reporter_comment="Nickel on Kobo FW >= 4.6
+This is specifically designed for stuff that needs to interact directly with Nickel,
+i.e., it matches *perfectly* the current TC used by Kobo (Linux 4.0, Glibc 2.19, GCC 4.9).
+Do *NOT* use to ship binaries for older FW versions.
+Unless you have a specific need for this, prefer the the arm-kobo-linux-gnueabihf TC:
+besides using a much saner and up to date GCC version,
+it will also generate binaries working on much older FW versions."

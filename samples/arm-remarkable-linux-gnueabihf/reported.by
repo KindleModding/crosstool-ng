@@ -1,0 +1,4 @@
+reporter_name="tcrs"
+reporter_url="https://github.com/tcrs/crosstool-ng"
+reporter_comment="reMarkable eInk tablet
+FW 2.x (earlier FW were running Linux 4.1, and possibly an earlier glibc version)."

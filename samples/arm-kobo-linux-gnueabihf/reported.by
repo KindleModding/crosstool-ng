@@ -1,0 +1,4 @@
+reporter_name="NiLuJe"
+reporter_url="https://github.com/NiLuJe/crosstool-ng"
+reporter_comment="Kobo
+This doesn't support truly old Kobo devices and FW (basically, forget anything that didn't take the turn to hardfloat)."
