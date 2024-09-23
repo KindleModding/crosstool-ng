@@ -1,0 +1,33 @@
+Original patch from: gentoo/src/patchsets/glibc/2.9/0030_all_glibc-respect-env-CPPFLAGS.patch
+
+-= BEGIN original header =-
+Respect environment CPPFLAGS when we run ./configure so we can inject
+random -D things without having to set CFLAGS/ASFLAGS
+
+-= END original header =-
+
+---
+ Makeconfig     |    1 +
+ config.make.in |    1 +
+ 2 files changed, 2 insertions(+)
+
+--- a/Makeconfig
++++ b/Makeconfig
+@@ -673,6 +673,7 @@
+ 	   $(foreach lib,$(libof-$(basename $(@F))) \
+ 		         $(libof-$(<F)) $(libof-$(@F)),$(CPPFLAGS-$(lib))) \
+ 	   $(CPPFLAGS-$(<F)) $(CPPFLAGS-$(@F)) $(CPPFLAGS-$(basename $(@F)))
++CPPFLAGS += $(CPPFLAGS-config)
+ override CFLAGS	= -std=gnu99 $(gnu89-inline-CFLAGS) \
+ 		  $(filter-out %frame-pointer,$(+cflags)) $(+gccwarn-c) \
+ 		  $(sysdep-CFLAGS) $(CFLAGS-$(suffix $@)) $(CFLAGS-$(<F)) \
+--- a/config.make.in
++++ b/config.make.in
+@@ -97,6 +97,7 @@
+ CXX = @CXX@
+ BUILD_CC = @BUILD_CC@
+ CFLAGS = @CFLAGS@
++CPPFLAGS-config = @CPPFLAGS@
+ ASFLAGS-config = @ASFLAGS_config@
+ AR = @AR@
+ RANLIB = @RANLIB@

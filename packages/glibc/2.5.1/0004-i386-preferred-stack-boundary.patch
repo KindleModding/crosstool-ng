@@ -1,0 +1,21 @@
+(C) 2007 Yann E. MORIN <yann.morin.1998@anciens.enib.fr>
+License: LGPL v2.1
+
+Shut off a stupid warning: preffered-stack-boundary must be between 4 ad 12,
+and 2 is not.
+
+---
+ sysdeps/i386/Makefile |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/sysdeps/i386/Makefile
++++ b/sysdeps/i386/Makefile
+@@ -36,7 +36,7 @@
+ ifeq ($(subdir),csu)
+ sysdep-CFLAGS += -mpreferred-stack-boundary=4
+ else
+-sysdep-CFLAGS += -mpreferred-stack-boundary=2
++sysdep-CFLAGS += -mpreferred-stack-boundary=4
+ # Likewise, any function which calls user callbacks
+ uses-callbacks += -mpreferred-stack-boundary=4
+ # Likewise, any stack alignment tests

@@ -1,0 +1,34 @@
+From a85b5cb4d4a5fc56e2b38638d270bf2daa67eb6c Mon Sep 17 00:00:00 2001
+From: Ulrich Drepper <drepper@gmail.com>
+Date: Thu, 13 Jan 2011 14:01:56 -0500
+Subject: [PATCH] Fix PLT use due to __libc_alloca_cutoff.
+
+---
+ include/alloca.h     |    1 +
+ nptl/alloca_cutoff.c |    3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+--- a/include/alloca.h
++++ b/include/alloca.h
+@@ -14,6 +14,7 @@
+ 
+ extern int __libc_use_alloca (size_t size) __attribute__ ((const));
+ extern int __libc_alloca_cutoff (size_t size) __attribute__ ((const));
++libc_hidden_proto (__libc_alloca_cutoff)
+ 
+ #define __MAX_ALLOCA_CUTOFF	65536
+ 
+--- a/nptl/alloca_cutoff.c
++++ b/nptl/alloca_cutoff.c
+@@ -1,5 +1,5 @@
+ /* Determine whether block of given size can be allocated on the stack or not.
+-   Copyright (C) 2002 Free Software Foundation, Inc.
++   Copyright (C) 2002, 2011 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+ 
+    The GNU C Library is free software; you can redistribute it and/or
+@@ -34,3 +34,4 @@
+ 			  assume the maximum available stack space.  */
+ 		       ?: __MAX_ALLOCA_CUTOFF * 4));
+ }
++libc_hidden_def (__libc_alloca_cutoff)

@@ -1,0 +1,15 @@
+---
+ nis/nss_nisplus/nisplus-alias.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/nis/nss_nisplus/nisplus-alias.c
++++ b/nis/nss_nisplus/nisplus-alias.c
+@@ -293,7 +293,7 @@
+ 	return status;
+     }
+ 
+-  if (name != NULL)
++  if (name == NULL)
+     {
+       *errnop = EINVAL;
+       return NSS_STATUS_UNAVAIL;
