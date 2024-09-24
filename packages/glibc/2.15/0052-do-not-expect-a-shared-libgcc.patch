@@ -1,0 +1,31 @@
+---
+ Makeconfig     |    4 ++--
+ dlfcn/Makefile |    2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+--- a/Makeconfig
++++ b/Makeconfig
+@@ -565,10 +565,10 @@
+ ifneq ($(have-as-needed),yes)
+  libgcc_eh := -lgcc_eh $(libunwind)
+ else
+- libgcc_eh := -Wl,--as-needed -lgcc_s $(libunwind) -Wl,--no-as-needed
++ libgcc_eh := -Wl,--as-needed $(libunwind) -Wl,--no-as-needed
+ endif
+ gnulib := -lgcc $(libgcc_eh)
+-static-gnulib := -lgcc -lgcc_eh $(libunwind)
++static-gnulib := -lgcc $(libunwind)
+ libc.so-gnulib := -lgcc
+ endif
+ ifeq ($(elf),yes)
+--- a/dlfcn/Makefile
++++ b/dlfcn/Makefile
+@@ -124,7 +124,7 @@
+ $(objpfx)bug-atexit2: $(libdl)
+ $(objpfx)bug-atexit2.out: $(objpfx)bug-atexit2-lib.so
+ 
+-LDLIBS-bug-atexit3-lib.so = -lstdc++ -lgcc_eh $(elfobjdir)/ld.so \
++LDLIBS-bug-atexit3-lib.so = -lstdc++ $(elfobjdir)/ld.so \
+ 			    $(common-objpfx)libc_nonshared.a
+ $(objpfx)bug-atexit3: $(libdl)
+ $(objpfx)bug-atexit3.out: $(objpfx)bug-atexit3-lib.so
