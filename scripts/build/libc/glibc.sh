@@ -193,6 +193,15 @@ glibc_backend_once()
         echo "libc_cv_c_cleanup=yes" >>config.cache
     fi
 
+    # The as-needed configure test expects libgcc_s to be available,
+    # which isn't the case in our core gcc build used to build the libc...
+    if [ -z "${CT_GLIBC_2_16_or_later}" ]; then
+        # No longer an issue after 2.16,
+        # c.f., https://sourceware.org/git/?p=glibc.git;a=commit;h=a3cc4f48e94f32c9532ee36982ac00eb1e5719b0
+        #     & https://sourceware.org/git/?p=glibc.git;a=commit;h=d4c2917fc5091dae7ab1b30c165becb70d3c3453
+        echo "libc_cv_as_needed=yes" >>config.cache
+    fi
+
     # Pre-seed the configparms file with values from the config option
     printf "%s\n" "${CT_GLIBC_CONFIGPARMS}" > configparms
 
