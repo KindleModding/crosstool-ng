@@ -221,6 +221,12 @@ glibc_backend_once()
         *)  glibc_cflags+=" -U_FORTIFY_SOURCE";;
     esac
 
+    # Really old glibc versions may not be standard compliant...
+    # e.g., on glibc 2.9: ../sysdeps/ieee754/dbl-64/s_copysign.c:27:16: error: redefinition of '__copysign'
+    if [ -z "${CT_GLIBC_2_10_or_later}" ]; then
+        glibc_cflags+=" -fgnu89-inline"
+    fi
+
     # In the order of increasing precedence. Flags common to compiler and linker.
     glibc_cflags+=" ${CT_ALL_TARGET_CFLAGS}"
     glibc_cflags+=" ${CT_GLIBC_EXTRA_CFLAGS}"
