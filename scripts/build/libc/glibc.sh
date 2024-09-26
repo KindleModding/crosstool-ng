@@ -221,7 +221,9 @@ glibc_backend_once()
         *)  glibc_cflags+=" -U_FORTIFY_SOURCE";;
     esac
 
-    # Really old glibc versions may not be standard compliant...
+    # glibc expects to be built with -fgnu89-inline semantics (to this day), but since the option appeared in GCC 4.2,
+    # really old glibc versions won't do it automatically...
+    # c.f., https://sourceware.org/git/?p=glibc.git;a=commit;f=Makeconfig;h=361468f226cb99fdebd8fabb3d9428a3632dc2d1
     # e.g., on glibc 2.9: ../sysdeps/ieee754/dbl-64/s_copysign.c:27:16: error: redefinition of '__copysign'
     if [ -z "${CT_GLIBC_2_10_or_later}" ]; then
         glibc_cflags+=" -fgnu89-inline"
