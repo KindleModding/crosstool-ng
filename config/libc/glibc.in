@@ -206,7 +206,7 @@ config GLIBC_EXTRA_CFLAGS
     string
     prompt "extra target CFLAGS"
     default "-Wno-missing-attributes -Wno-array-bounds -Wno-array-parameter -Wno-stringop-overflow -Wno-maybe-uninitialized" if GLIBC_2_29_or_older && GCC_11_or_later && !GCC_14_or_later
-    default "-Wno-missing-attributes -Wno-array-bounds -Wno-array-parameter -Wno-stringop-overflow -Wno-maybe-uninitialized -Wno-error=implicit-function-declaration -Wno-implicit-int -Wno-error=declaration-missing-parameter-type" if GLIBC_2_29_or_older && GCC_14_or_later
+    default "-Wno-missing-attributes -Wno-array-bounds -Wno-array-parameter -Wno-stringop-overflow -Wno-maybe-uninitialized -Wno-error=implicit-function-declaration -Wno-error=implicit-int -Wno-error=declaration-missing-parameter-type -Wno-error=int-conversion" if GLIBC_2_29_or_older && GCC_14_or_later
     default ""
     help
       Extra target CFLAGS to use when building.
