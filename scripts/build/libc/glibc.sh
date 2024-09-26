@@ -222,8 +222,11 @@ glibc_backend_once()
     esac
 
     # glibc expects to be built with -fgnu89-inline semantics (to this day), but since the option appeared in GCC 4.2,
-    # really old glibc versions won't do it automatically...
+    # really old glibc versions won't do it automatically (and/or the original autoconf test might be borked on older versions)...
     # c.f., https://sourceware.org/git/?p=glibc.git;a=commit;f=Makeconfig;h=361468f226cb99fdebd8fabb3d9428a3632dc2d1
+    #       (hard-coded because the minimum required GCC version became higher than 4.2; introduced in glibc 2.23)
+    #     & https://sourceware.org/git/?p=glibc.git;a=commit;f=Makeconfig;h=b037a293a48718af30d706c2e18c929d0e69a621
+    #       (initial autoconf test, introduced in glibc 2.6)
     # e.g., on glibc 2.9: ../sysdeps/ieee754/dbl-64/s_copysign.c:27:16: error: redefinition of '__copysign'
     if [ -z "${CT_GLIBC_2_10_or_later}" ]; then
         glibc_cflags+=" -fgnu89-inline"
