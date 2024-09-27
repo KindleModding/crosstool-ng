@@ -105,6 +105,10 @@ config NCURSES_TARGET
     bool
     select COMP_LIBS_NCURSES
 
+config XCRYPT_TARGET
+    bool
+    select COMP_LIBS_XCRYPT
+
 config ZLIB_NEEDED
     bool "Build local zlib"
     select COMP_LIBS_ZLIB
@@ -154,6 +158,10 @@ config EXPAT
 config NCURSES
     def_bool y
     depends on NCURSES_NEEDED
+
+config XCRYPT
+    bool
+    select XCRYPT_TARGET
 
 config ZLIB
     def_bool y
