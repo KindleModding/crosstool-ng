@@ -67,8 +67,8 @@ do_xcrypt_backend() {
     if [ "${shared}" != "y" ]; then
         extra_config+=("--disable-shared")
     fi
-    # NOTE: Ideally, this should be tied to a glibc flag controlling wether we pass `--disable-crypt` or not
-    #       (or whether glibc itself defaults to that, e.g., on newer versions).
+    # NOTE: We assume that we only want a *single* crypt implementation,
+    #       so CT_XCRYPT_TARGET is only set when glibc's libcrypt has been disabled.
     extra_config+=("--enable-obsolete-api=no")
 
     CT_DoLog EXTRA "Configuring libxcrypt"

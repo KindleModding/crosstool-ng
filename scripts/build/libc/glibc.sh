@@ -248,6 +248,12 @@ glibc_backend_once()
                 ;;
         esac
     done
+
+    # Disable the deprecated libcrypt if requested
+    if [ "${CT_GLIBC_DISABLE_DEPRECATED_LIBCRYPT}" = "y" ]; then
+        extra_config+=("--disable-crypt")
+    fi
+
     CT_DoArchGlibcAdjustConfigure extra_config "${glibc_cflags}"
 
     # ./configure is mislead by our tools override wrapper for bash

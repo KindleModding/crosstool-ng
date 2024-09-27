@@ -105,8 +105,13 @@ config NCURSES_TARGET
     bool
     select COMP_LIBS_NCURSES
 
+config XCRYPT_NEEDED
+    bool
+    select COMP_LIBS_XCRYPT
+
 config XCRYPT_TARGET
     bool
+    depends on !GLIBC_ENABLE_OBSOLETE_LIBCRYPT
     select COMP_LIBS_XCRYPT
 
 config ZLIB_NEEDED
@@ -161,7 +166,7 @@ config NCURSES
 
 config XCRYPT
     bool
-    select XCRYPT_TARGET
+    depends on XCRYPT_NEEDED
 
 config ZLIB
     def_bool y
