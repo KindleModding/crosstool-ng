@@ -1,0 +1,27 @@
+---
+ configure    |    2 +-
+ configure.in |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+--- a/configure
++++ b/configure
+@@ -6698,7 +6698,7 @@
+   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); }; }
+   then
+-    if readelf -S conftest.so | grep '\.rel\(a\|\)\.dyn' > /dev/null; then
++    if readelf -S conftest.so | grep '\.\(rel\|rela\)\.dyn' > /dev/null; then
+       libc_cv_z_combreloc=yes
+     else
+       libc_cv_z_combreloc=no
+--- a/configure.in
++++ b/configure.in
+@@ -1660,7 +1660,7 @@
+ dnl introducing new options this is not easily doable.  Instead use a tool
+ dnl which always is cross-platform: readelf.  To detect whether -z combreloc
+ dnl look for a section named .rel.dyn.
+-    if readelf -S conftest.so | grep '\.rel\(a\|\)\.dyn' > /dev/null; then
++    if readelf -S conftest.so | grep '\.\(rel\|rela\)\.dyn' > /dev/null; then
+       libc_cv_z_combreloc=yes
+     else
+       libc_cv_z_combreloc=no

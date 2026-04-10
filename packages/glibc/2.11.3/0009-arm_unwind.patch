@@ -1,0 +1,27 @@
+---
+ nptl/sysdeps/pthread/unwind-forcedunwind.c |    2 +-
+ nptl/sysdeps/pthread/unwind-resume.c       |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+--- a/nptl/sysdeps/pthread/unwind-forcedunwind.c
++++ b/nptl/sysdeps/pthread/unwind-forcedunwind.c
+@@ -25,7 +25,7 @@
+ #include <libgcc_s.h>
+ 
+ static void *libgcc_s_handle;
+-static void (*libgcc_s_resume) (struct _Unwind_Exception *exc);
++static void (*libgcc_s_resume) (struct _Unwind_Exception *exc) __attribute_used__;
+ static _Unwind_Reason_Code (*libgcc_s_personality)
+   (int, _Unwind_Action, _Unwind_Exception_Class, struct _Unwind_Exception *,
+    struct _Unwind_Context *);
+--- a/nptl/sysdeps/pthread/unwind-resume.c
++++ b/nptl/sysdeps/pthread/unwind-resume.c
+@@ -22,7 +22,7 @@
+ #include <unwind.h>
+ #include <libgcc_s.h>
+ 
+-static void (*libgcc_s_resume) (struct _Unwind_Exception *exc);
++static void (*libgcc_s_resume) (struct _Unwind_Exception *exc) __attribute_used__;
+ static _Unwind_Reason_Code (*libgcc_s_personality)
+   (int, _Unwind_Action, _Unwind_Exception_Class, struct _Unwind_Exception *,
+    struct _Unwind_Context *);

@@ -1,0 +1,28 @@
+---
+ sysdeps/unix/sysv/linux/alpha/sigsuspend.S |   18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+--- a/sysdeps/unix/sysv/linux/alpha/sigsuspend.S
++++ b/sysdeps/unix/sysv/linux/alpha/sigsuspend.S
+@@ -31,3 +31,21 @@
+ libc_hidden_def (__sigsuspend)
+ weak_alias (__sigsuspend, sigsuspend)
+ strong_alias (__sigsuspend, __libc_sigsuspend)
++
++#ifndef NO_CANCELLATION
++	.globl __sigsuspend_nocancel;
++	.align 4;
++	.type __sigsuspend_nocancel, @function;
++	.usepv __sigsuspend_nocancel, std;
++	cfi_startproc;
++__LABEL(__sigsuspend_nocancel)
++	ldgp    gp, 0(pv);
++	PSEUDO_PROF;
++	PSEUDO_PREPARE_ARGS
++	lda     v0, SYS_ify(sigsuspend);
++	call_pal PAL_callsys;
++	bne     a3, SYSCALL_ERROR_LABEL;
++	ret;
++	cfi_endproc;
++	.size __sigsuspend_nocancel, .-__sigsuspend_nocancel
++#endif

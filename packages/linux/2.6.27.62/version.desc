@@ -1,0 +1,3 @@
+# Earliest 2.6 LTS, used for the legacy Kindle TC
+obsolete='yes'
+archive_formats='.tar.xz .tar.bz2 .tar.gz'

@@ -1785,6 +1785,7 @@ CT_Mirrors()
         echo "https://ftp.gnu.org/gnu/${project}"
         echo "http://ftp.gnu.org/gnu/${project}"
         echo "ftp://ftp.gnu.org/gnu/${project}"
+        echo "http://files.ak-team.com/niluje/gentoo"
         ;;
     sourceware)
         echo "https://sourceware.org/${project}/ftp"

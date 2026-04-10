@@ -1,0 +1,15 @@
+---
+ nptl/init.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/nptl/init.c
++++ b/nptl/init.c
+@@ -236,7 +236,7 @@
+ 
+ 
+ /* This can be set by the debugger before initialization is complete.  */
+-static bool __nptl_initial_report_events;
++static bool __nptl_initial_report_events __attribute_used__;
+ 
+ void
+ __pthread_initialize_minimal_internal (void)

@@ -7,13 +7,74 @@ glibc_get()
     local date
     local version
 
+    if [ "${CT_GLIBC_USE_PORTS_EXTERNAL}" = "y" ]; then
+        CT_Fetch GLIBC_PORTS
+    fi
     CT_Fetch GLIBC
     return 0
 }
 
+do_libc_patch_aclocal.m4() {
+    cat << EOF >> aclocal.m4
+AC_DEFUN([CT_NG_AC_CHECK_PROG_VER],
+[AC_CHECK_PROGS([\$1], [\$2])
+if test -z "[\$]\$1"; then
+  ac_verc_fail=yes
+else
+  ac_verc_fail=no
+fi
+ifelse([\$6],,,
+[if test \$ac_verc_fail = yes; then
+  \$6
+fi])
+])
+EOF
+
+    # And make sure the autoconf sanity checks won't bother us...
+    sed -re \
+        "s/(m4_define\(\[GLIBC_AUTOCONF_VERSION\], \[)([[:digit:]\.]*)(\]\))/\1$(autoconf --version | head -n 1 | cut -d " " -f 4)\3/" \
+        -i aclocal.m4
+}
+
+nerf_tools_version_checks() {
+    if [ -f aclocal.m4 ]; then
+        local conf_file
+
+        # We need to have this in a seperate function
+        # otherwise CT_DoExecLog will append extra stuff
+        # in the appended string.
+        CT_DoExecLog DEBUG do_libc_patch_aclocal.m4
+
+        if [ -f configure.in ]; then
+            conf_file="configure.in"
+        elif [ -f configure.ac ]; then
+            conf_file="configure.ac"
+        fi
+
+        if [ -n "${conf_file}" ]; then
+            CT_DoExecLog DEBUG sed -re \
+                's/\<(AC_CHECK_PROG_VER)/CT_NG_\1/g' \
+                -i ${conf_file}
+        fi
+
+        CT_DoExecLog DEBUG autoconf -f
+    fi
+}
+
 glibc_extract()
 {
-    CT_ExtractPatch GLIBC
+    CT_ExtractPatch GLIBC nerf_tools_version_checks
+    if [ "${CT_GLIBC_USE_PORTS_EXTERNAL}" = "y" ]; then
+        CT_ExtractPatch GLIBC_PORTS
+
+        # This may create a bogus symlink if glibc-ports is using custom
+        # sources or has an overlay (and glibc is shared). However,
+        # we do not support concurrent use of the source directory
+        # and next run, if using different glibc-ports source, will override
+        # this symlink anyway.
+        CT_DoExecLog ALL ln -sf "${CT_SRC_DIR}/${CT_GLIBC_PORTS_DIR_NAME}" \
+            "${CT_SRC_DIR}/${CT_GLIBC_DIR_NAME}/ports"
+    fi
 }
 
 # This function builds and install the full C library
@@ -132,6 +193,15 @@ glibc_backend_once()
         echo "libc_cv_c_cleanup=yes" >>config.cache
     fi
 
+    # The as-needed configure test expects libgcc_s to be available,
+    # which isn't the case in our core gcc build used to build the libc...
+    if [ -z "${CT_GLIBC_2_16_or_later}" ]; then
+        # No longer an issue after 2.16,
+        # c.f., https://sourceware.org/git/?p=glibc.git;a=commit;h=a3cc4f48e94f32c9532ee36982ac00eb1e5719b0
+        #     & https://sourceware.org/git/?p=glibc.git;a=commit;h=d4c2917fc5091dae7ab1b30c165becb70d3c3453
+        echo "libc_cv_as_needed=yes" >>config.cache
+    fi
+
     # Pre-seed the configparms file with values from the config option
     printf "%s\n" "${CT_GLIBC_CONFIGPARMS}" > configparms
 
@@ -151,6 +221,17 @@ glibc_backend_once()
         *)  glibc_cflags+=" -U_FORTIFY_SOURCE";;
     esac
 
+    # glibc expects to be built with -fgnu89-inline semantics (to this day), but since the option appeared in GCC 4.2,
+    # really old glibc versions won't do it automatically (and/or the original autoconf test might be borked on older versions)...
+    # c.f., https://sourceware.org/git/?p=glibc.git;a=commit;f=Makeconfig;h=361468f226cb99fdebd8fabb3d9428a3632dc2d1
+    #       (hard-coded because the minimum required GCC version became higher than 4.2; introduced in glibc 2.23)
+    #     & https://sourceware.org/git/?p=glibc.git;a=commit;f=Makeconfig;h=b037a293a48718af30d706c2e18c929d0e69a621
+    #       (initial autoconf test, introduced in glibc 2.6)
+    # e.g., on glibc 2.9: ../sysdeps/ieee754/dbl-64/s_copysign.c:27:16: error: redefinition of '__copysign'
+    if [ -z "${CT_GLIBC_2_10_or_later}" ]; then
+        glibc_cflags+=" -fgnu89-inline"
+    fi
+
     # In the order of increasing precedence. Flags common to compiler and linker.
     glibc_cflags+=" ${CT_ALL_TARGET_CFLAGS}"
     glibc_cflags+=" ${CT_GLIBC_EXTRA_CFLAGS}"
@@ -167,6 +248,12 @@ glibc_backend_once()
                 ;;
         esac
     done
+
+    # Disable the deprecated libcrypt if requested
+    if [ "${CT_GLIBC_DISABLE_DEPRECATED_LIBCRYPT}" = "y" ]; then
+        extra_config+=("--disable-crypt")
+    fi
+
     CT_DoArchGlibcAdjustConfigure extra_config "${glibc_cflags}"
 
     # ./configure is mislead by our tools override wrapper for bash
@@ -233,7 +320,10 @@ glibc_backend_once()
 
     # Mask C++ compiler. Glibc 2.29+ attempts to build some tests using gcc++, but
     # we haven't built libstdc++ yet. Should really implement #808 after 1.24.0...
-    extra_make_args+=( CXX= )
+    # c.f., https://github.com/stilor/crosstool-ng/commit/f71d3cb1c23d1e76fbc6549a04c64f6a8d5d4621
+    if [ "${CT_GLIBC_2_29_or_later}" = "y" ]; then
+        extra_make_args+=( CXX= )
+    fi
     case "${CT_ARCH},${CT_ARCH_CPU}" in
         powerpc,8??)
             # http://sourceware.org/ml/crossgcc/2008-10/msg00068.html

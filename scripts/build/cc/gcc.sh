@@ -608,6 +608,24 @@ do_gcc_core_backend() {
         fi
     fi
 
+    # GCC 11+ switched the default C++ standard to gnu++17 but very old GCC versions may not have been compliant yet...
+    # FIXME: GCC breakpoint is an educated guess, I only confirmed that 4.9 needs this.
+    if [ -z "${CT_GCC_5_or_later}" ]; then
+        if [ "${host}" = "${CT_BUILD}" ]; then
+            if [ "$(${CT_BUILD}-gcc -dumpversion)" -ge "11" ]; then
+                cxxflags="$cxxflags -std=gnu++14"
+                cxxflags_for_build="$cxxflags_for_build -std=gnu++14"
+            fi
+        else
+            if [ "$(${CT_HOST}-gcc -dumpversion)" -ge "11" ]; then
+                cxxflags="$cxxflags -std=gnu++14"
+            fi
+            if [ "$(${CT_BUILD}-gcc -dumpversion)" -ge "11" ]; then
+                cxxflags_for_build="$cxxflags_for_build -std=gnu++14"
+            fi
+        fi
+    fi
+
     # Add an extra system include dir if we have one. This is especially useful
     # when building libstdc++ with a libc other than the system libc (e.g.
     # picolibc)
@@ -1267,6 +1285,10 @@ do_gcc_backend() {
         fi
     fi
 
+    if [ "${CT_GCC_5_or_later}" = "y" ]; then
+        extra_config+=("--with-diagnostics-color=auto")
+    fi
+
     CT_DoLog DEBUG "Extra config passed: '${extra_config[*]}'"
 
     # We may need to modify host/build/target CFLAGS separately below
@@ -1285,6 +1307,24 @@ do_gcc_backend() {
         # FIXME we currently don't support clang as host compiler, only as build
         if ${CT_BUILD}-gcc --version 2>&1 | grep clang; then
             cflags_for_build="$cflags_for_build "-fbracket-depth=512
+        fi
+    fi
+
+    # GCC 11+ switched the default C++ standard to gnu++17 but very old GCC versions may not have been compliant yet...
+    # FIXME: GCC breakpoint is an educated guess, I only confirmed that 4.9 needs this.
+    if [ -z "${CT_GCC_5_or_later}" ]; then
+        if [ "${host}" = "${CT_BUILD}" ]; then
+            if [ "$(${CT_BUILD}-gcc -dumpversion)" -ge "11" ]; then
+                cxxflags="$cxxflags -std=gnu++14"
+                cxxflags_for_build="$cxxflags_for_build -std=gnu++14"
+            fi
+        else
+            if [ "$(${CT_HOST}-gcc -dumpversion)" -ge "11" ]; then
+                cxxflags="$cxxflags -std=gnu++14"
+            fi
+            if [ "$(${CT_BUILD}-gcc -dumpversion)" -ge "11" ]; then
+                cxxflags_for_build="$cxxflags_for_build -std=gnu++14"
+            fi
         fi
     fi
 

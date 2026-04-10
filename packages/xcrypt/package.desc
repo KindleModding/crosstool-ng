@@ -1,0 +1,8 @@
+repository='git https://github.com/besser82/libxcrypt.git'
+repository_subdir='libxcrypt'
+bootstrap='./autogen.sh'
+mirrors='https://github.com/besser82/libxcrypt/releases/download/v${CT_XCRYPT_VERSION}'
+archive_filename='lib@{pkg_name}-@{version}'
+archive_dirname='lib@{pkg_name}-@{version}'
+archive_formats='.tar.xz'
+relevantpattern='*.*|.'

@@ -1,0 +1,4 @@
+reporter_name="NiLuJe"
+reporter_url="https://github.com/NiLuJe/crosstool-ng"
+reporter_comment="Kindle 2/DX/DXG/3
+Actual devices run glibc 2.5, meaning some trickery with CFLAGS (and more) is needed to avoid pulling in newer symbols."
